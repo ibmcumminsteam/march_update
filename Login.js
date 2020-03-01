@@ -11,7 +11,8 @@ import {
     ActivityIndicator,
     TouchableOpacity,
     Image,
-    ImageBackground
+    ImageBackground,
+    Alert,
 } from 'react-native';
 // import { Button } from 'react-native-elements';
 
@@ -19,24 +20,59 @@ import { createStackNavigator } from 'react-navigation-stack';
 import { withNavigation } from 'react-navigation';
 import {NavigationActions} from 'react-navigation';
 
+
 class Login extends Component {
-   
-    state={
 
-        name:'',
-        pass: '',
-        host: '',
-    
-
+constructor() {
+ 
+  super() ;
+  
+    this.state = {
+ 
+      username:'',
+      password:'',
+      hostname:'',
     }
-    onLoginPress=()=>{
+ 
+}
 
-        if(this.state.name=='Swanand' || this.state.name=='swanand' && this.state.pass == 'L0ngl1vecps' && this.state.host == '10.76.125.214'){
+onLoginPress=()=>{
+
+      fetch('http://<Insert your IP address>/ibm/login.php',  {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        
+        body: JSON.stringify({
+  
+          username: this.state.username,
+      
+          password: this.state.password,
+      
+          hostname: this.state.hostname
+      
+        })
+      
+      }).then((response) => response.json())
+      .then((responseJson) => {
+ 
+        // If server response message same as Data Matched
+       if(responseJson === 'Data Matched')
+        {
+            //Then open Profile activity and send user email to profile activity.
             this.props.navigation.navigate('Screen1');
         }
-      else{
-          return(<>{alert("Please enter valid credentials")}</>)
-      }
+        else
+        {
+          Alert.alert(responseJson);
+        }
+ 
+      }).catch((error) => {
+        console.error(error);
+      });
+
     }
 
 
@@ -47,40 +83,36 @@ class Login extends Component {
            
 
                       <View>
-
+                      <Image 
+                      source={require('./assets/images/login_icon.png')} 
+                      style ={{alignSelf:'center',height:100,width:250,marginLeft:600, marginTop:100, marginRight:600 }}/>
                       <Text 
                         style={{fontSize: 27, paddingBottom: 40, textAlign: 'center', marginTop: 50,}}>
-                        Login
+                        Login page
                       </Text>
           
                       <TextInput 
                       placeholder='Username' 
                       style={styles.input}
-                      value={this.state.name}
-                      onChangeText={(name) => this.setState({name})}
-
-
-
+                      value={this.state.username}
+                      onChangeText={(username) => this.setState({username})}
                       />
 
                       <TextInput 
                       placeholder='Password' 
                       style={styles.input}
-                      value={this.state.pass}
-                      onChangeText={(pass) => this.setState({pass})}
-
-
-
+                      value={this.state.password}
+                      secureTextEntry={true}
+                      onChangeText={(password) => this.setState({password})}
                       />
+
                       <TextInput 
                       placeholder='Hostname' 
                       style={styles.input}
-                      value={this.state.host}
-                      onChangeText={(host) => this.setState({host})}
-
-
-
+                      value={this.state.hostname}
+                      onChangeText={(hostname) => this.setState({hostname})}
                       />
+
                       <View style={{margin:7}} />
 
                       <View style={{paddingTop:50, height : 100, width: 200, alignSelf: 'center'}}>
@@ -90,22 +122,12 @@ class Login extends Component {
                             // onPress={()=>  this.props.navigation.navigate('Screen1')}
                             onPress ={this.onLoginPress}
                             title="Submit"
+                            disabled={(this.state.username == '' || this.state.password == '' || this.state.hostname == '') ? true : false}
 
                             style={styles.button_style}
                             
                           />
                           </View>
-                      <View style={{paddingTop:50, height : 100, width: 200, alignSelf: 'center'}}>
-                      <Button 
-                      //   onPress={this.props.onLoginPress}
-                      // {...this.props.navigation.navigate('Screen1')}
-                      // onPress={}
-                      title="Exit"
-                      onPress={() => BackHandler.exitApp()}
-
-
-                      />
-                      </View>
 
                       </View>
                     
@@ -114,14 +136,6 @@ class Login extends Component {
                   </>
             )
     }
-
-    // showDetails(){
-
-    //     this.props.navigation.navigate('Screen1')
-    // }
-
-
-
 
 }
 
@@ -132,10 +146,10 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 15,
     marginLeft: 20,
-    marginRight: 20
-    
-
+    marginRight: 20,
+    borderRadius: 20,
     },
+
     button_style: {
 
        marginLeft:  50,
@@ -143,19 +157,11 @@ const styles = StyleSheet.create({
        height: 44, 
        marginBottom: 200,
        paddingBottom: 100
-        
-
     },
-    // container: {
-    //   flex: 1,
-    //   width: null,
-    //   height: null,
-    //   resizeMode: 'cover',
-    //   // backgroundColor: 'rgba(255,0,0,.6)',
-    //   opacity: 0.9
-    // }
+    
   });
 console.disableYellowBox = true;
 export default withNavigation(Login);
+
 
 
